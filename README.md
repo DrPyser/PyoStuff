@@ -11,4 +11,6 @@ Stuff written with Pyo Python dsp library.
 * midienv.py : attempt at a table-defined midi envelope, with a table for Attack/Decay phase and another for Release. Work In Progress;
 * triggers.py : miscellaneous trigger generators or trigger listeners. 
   * Trigmap : given a list(tuple) of triggers and a list(tuple) of numerical values, associate each trigger to a value, such that the output is set to the value associated with the last received trigger. 
-
+  * TrigAnd : given two triggers and a windowlen parameter(in seconds), sends a trigger when both input triggers are received in the timeframe defined by 'windowlen'
+  * TrigOr : given two triggers and a windowlen parameter(in seconds), sends a trigger when either input triggers are received in the timeframe defined by 'windowlen'
+  * TrigXor : given two triggers and a windowlen parameter(in seconds), sends a trigger when only one of the input triggers are received in the timeframe defined by 'windowlen'

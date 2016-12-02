@@ -18,7 +18,7 @@ class MidiEnv(PyoObject):
         self._adenv = TrigEnv(self._trigon, adtable, dur=addur)
         self._susenv = TrigMap((self._adenv["trig"], self._trigoff), values=(self._sustain, 0), init=0)
         self._relenv = TrigEnv(self._trigoff, reltable, dur=reldur, mul=SampHold(self._adenv+self._susenv, self._trigoff, value=1))
-        self._phase = TrigMap((self._trigon, self._adenv["trig"], self._trigoff), values=(0, 1, 2), init=0)
+        self._phase = TrigMap((self._trigon, TrigGate(self._adenv["trig"], self._trigon, self._trigoff), self._trigoff), values=(0, 1, 2), init=0)
         self._mix = Selector([self._adenv, self._susenv, self._relenv], voice=self._phase, mul=Sig(self._in_fader, mul=self._mul))
         self._base_objs = self._mix.getBaseObjects()
 

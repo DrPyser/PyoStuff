@@ -116,3 +116,348 @@ class TrigMap(PyoObject):
     @values.setter
     def values(self, x):
         self.setValues(x)
+
+class TrigAnd(PyoObject):
+    def __init__(self, trig1, trig2, windowlen=0, mul=1, add=0):
+        pyoArgsAssert(self, "ooOOO", trig1, trig2, windowlen, mul, add)
+        PyoObject.__init__(self, mul, add)
+        self._trig1 = trig1
+        self._trig2 = trig2
+        self._in_fader1 = InputFader(trig1)
+        self._in_fader2 = InputFader(trig2)
+        self._windowlen = windowlen
+        trig1, trig2, windowlen, lmax = convertArgsToLists(trig1, trig2, windowlen)
+        self._hold1 = TrigEnv(self._in_fader1, LinTable([(0,1), (8192,1)]), dur=windowlen)
+        self._hold2 = TrigEnv(self._in_fader2, LinTable([(0,1), (8192,1)]), dur=windowlen)
+        self._out = Thresh(self._hold1+self._hold2, threshold=1, dir=0)
+        self._base_objs = self._out.getBaseObjects()
+
+    def setTrig1(self, x, fadetime=0.05):
+        """
+        Replace the `trig1` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._trig1 = x
+        self._in_fader1.setInput(x, fadetime)
+
+
+    def setTrig2(self, x, fadetime=0.05):
+        """
+        Replace the `trig2` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._trig2 = x
+        self._in_fader2.setInput(x, fadetime)
+
+    def setWindowlen(self, x):
+        self._windowlen = x
+        self._timer.time = x
+
+    @property
+    def trig1(self):
+        """PyoObject. Timer stop signal."""
+        return self._trig1
+    @trig1.setter
+    def trig1(self, x): self.setTrig1(x)
+
+    @property
+    def trig2(self):
+        """PyoObject. Timer start signal."""
+        return self._trig2
+    @trig2.setter
+    def trig2(self, x): self.setTrig2(x)
+    
+    @property
+    def windowlen(self):
+        return self._windowlen
+    @windowlen.setter
+    def windowlen(self, x):
+        self.setWindowlen(x)
+
+    def ctrl(self, map_list=None, title=None, wxnoserver=False):
+        self._map_list = [
+            SLMap(0.0001, 10, "log", "windowlen", self._windowlen),
+        ]
+
+        PyoObject.ctrl(self, map_list, title, wxnoserver)
+
+
+class TrigOr(PyoObject):
+    def __init__(self, trig1, trig2, windowlen=0, mul=1, add=0):
+        pyoArgsAssert(self, "ooOOO", trig1, trig2, windowlen, mul, add)
+        PyoObject.__init__(self, mul, add)
+        self._trig1 = trig1
+        self._trig2 = trig2
+        self._in_fader1 = InputFader(trig1)
+        self._in_fader2 = InputFader(trig2)
+        self._windowlen = windowlen
+        trig1, trig2, windowlen, lmax = convertArgsToLists(trig1, trig2, windowlen)
+        self._hold1 = TrigEnv(self._in_fader1, LinTable([(0,1), (8192,1)]), dur=windowlen)
+        self._hold2 = TrigEnv(self._in_fader2, LinTable([(0,1), (8192,1)]), dur=windowlen)
+        self._out = Thresh(self._hold1+self._hold2, threshold=0, dir=0)
+        self._base_objs = self._out.getBaseObjects()
+
+    def setTrig1(self, x, fadetime=0.05):
+        """
+        Replace the `trig1` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._trig1 = x
+        self._in_fader1.setInput(x, fadetime)
+
+
+    def setTrig2(self, x, fadetime=0.05):
+        """
+        Replace the `trig2` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._trig2 = x
+        self._in_fader2.setInput(x, fadetime)
+
+    def setWindowlen(self, x):
+        self._windowlen = x
+        self._timer.time = x
+
+    @property
+    def trig1(self):
+        """PyoObject. Timer stop signal."""
+        return self._trig1
+    @trig1.setter
+    def trig1(self, x): self.setTrig1(x)
+
+    @property
+    def trig2(self):
+        """PyoObject. Timer start signal."""
+        return self._trig2
+    @trig2.setter
+    def trig2(self, x): self.setTrig2(x)
+    
+    @property
+    def windowlen(self):
+        return self._windowlen
+    @windowlen.setter
+    def windowlen(self, x):
+        self.setWindowlen(x)
+
+    def ctrl(self, map_list=None, title=None, wxnoserver=False):
+        self._map_list = [
+            SLMap(0.0001, 10, "log", "windowlen", self._windowlen),
+        ]
+
+        PyoObject.ctrl(self, map_list, title, wxnoserver)
+
+class TrigXor(PyoObject):
+    def __init__(self, trig1, trig2, windowlen=0, mul=1, add=0):
+        pyoArgsAssert(self, "ooOOO", trig1, trig2, windowlen, mul, add)
+        PyoObject.__init__(self, mul, add)
+        self._trig1 = trig1
+        self._trig2 = trig2
+        self._in_fader1 = InputFader(trig1)
+        self._in_fader2 = InputFader(trig2)
+        self._windowlen = windowlen
+        trig1, trig2, windowlen, lmax = convertArgsToLists(trig1, trig2, windowlen)
+        self._hold1 = TrigEnv(self._in_fader1, LinTable([(0,1), (8192,1)]), dur=windowlen)
+        self._hold2 = TrigEnv(self._in_fader2, LinTable([(0,1), (8192,1)]), dur=windowlen)
+        self._out = Select(self._hold1+self._hold2, value=1)
+        self._base_objs = self._out.getBaseObjects()
+
+    def setTrig1(self, x, fadetime=0.05):
+        """
+        Replace the `trig1` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._trig1 = x
+        self._in_fader1.setInput(x, fadetime)
+
+
+    def setTrig2(self, x, fadetime=0.05):
+        """
+        Replace the `trig2` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._trig2 = x
+        self._in_fader2.setInput(x, fadetime)
+
+    def setWindowlen(self, x):
+        self._windowlen = x
+        self._timer.time = x
+
+    @property
+    def trig1(self):
+        """PyoObject. Timer stop signal."""
+        return self._trig1
+    @trig1.setter
+    def trig1(self, x): self.setTrig1(x)
+
+    @property
+    def trig2(self):
+        """PyoObject. Timer start signal."""
+        return self._trig2
+    @trig2.setter
+    def trig2(self, x): self.setTrig2(x)
+    
+    @property
+    def windowlen(self):
+        return self._windowlen
+    @windowlen.setter
+    def windowlen(self, x):
+        self.setWindowlen(x)
+
+    def ctrl(self, map_list=None, title=None, wxnoserver=False):
+        self._map_list = [
+            SLMap(0.0001, 10, "log", "windowlen", self._windowlen),
+        ]
+
+        PyoObject.ctrl(self, map_list, title, wxnoserver)
+
+        
+class TrigGate(PyoObject):
+    def __init__(self, input, open, close, mul=1, add=0):
+        pyoArgsAssert(self, "oooOO", input, open, close, mul, add)
+        PyoObject.__init__(self, mul, add)
+        self._input = input
+        self._open = open
+        self._close = close
+        self._input_fader = InputFader(input)
+        self._open_fader = InputFader(open)
+        self._close_fader = InputFader(close)
+        self._out = Sig(self._input_fader, mul=TrigMap((self._open_fader, self._close_fader), values=(1, 0)))
+        self._base_objs = self._out.getBaseObjects()
+
+    def setInput(self, x, fadetime=0.05):
+        """
+        Replace the `input` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._input = x
+        self._input_fader.setInput(x, fadetime)
+
+
+    def setOpen(self, x, fadetime=0.05):
+        """
+        Replace the `open` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._open = x
+        self._open_fader.setInput(x, fadetime)
+
+    def setClose(self, x, fadetime=0.05):
+        """
+        Replace the `close` attribute.
+
+        :Args:
+
+            x: PyoObject
+                New signal to process.
+            fadetime: float, optional
+                Crossfade time between old and new input. Default to 0.05.
+
+        """
+        pyoArgsAssert(self, "oN", x, fadetime)
+        self._close = x
+        self._close_fader.setInput(x, fadetime)
+
+    @property
+    def input(self):
+        """PyoObject. input signal to pass or block."""
+        return self._input
+    @input.setter
+    def input(self, x): self.setInput(x)
+
+    @property
+    def open(self):
+        """PyoObject. Timer start signal."""
+        return self._open
+    @open.setter
+    def open(self, x): self.setOpen(x)
+    
+    @property
+    def close(self):
+        return self._close
+    @close.setter
+    def close(self, x):
+        self.setClose(x)
+
+    def ctrl(self, map_list=None, title=None, wxnoserver=False):
+        self._map_list = [
+            SLMapMul(self._mul)
+        ]
+
+        PyoObject.ctrl(self, map_list, title, wxnoserver)
+    
+
+if __name__ == '__main__':
+    # Running as a script
+    s = Server().boot()
+    a = Sine()
+    b = Trig()
+    c = Metro(time=1)
+    d = TrigGate(a,b,c)
+    Scope(d)
+    s.gui(locals())
+        
+        
